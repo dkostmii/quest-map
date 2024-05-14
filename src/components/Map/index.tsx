@@ -11,9 +11,9 @@ mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN
 function Map() {
   const map = useRef(null)
   const mapContainer = useRef(null)
-  const [lng, setLng] = useState(-70.9)
-  const [lat, setLat] = useState(42.35)
-  const [zoom, setZoom] = useState(9)
+  const [lng] = useState(-70.9)
+  const [lat] = useState(42.35)
+  const [zoom] = useState(9)
 
   useEffect(() => {
     if (map.current) return
@@ -23,7 +23,7 @@ function Map() {
       center: [lng, lat],
       zoom: zoom
     })
-  }, [])
+  }, [lng, lat, zoom])
 
   return (
     <div>
