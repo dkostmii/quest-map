@@ -56,9 +56,12 @@ function Map() {
 
       if (nearest) {
         if (e.originalEvent.button === 3) {
-          const foundMarker = markers.find(m => {
+          const foundMarker = markers.find((m) => {
             const lngLat = m.getLngLat()
-            return lngLat.lat === nearest.location.lat && lngLat.lng === nearest.location.lng
+            return (
+              lngLat.lat === nearest.location.lat &&
+              lngLat.lng === nearest.location.lng
+            )
           })
 
           if (foundMarker) {
@@ -88,7 +91,9 @@ function Map() {
   return (
     <div>
       <p>Click on the map to add a quest</p>
-      <button type="button" onClick={removeActiveQuestHandler}>Remove active quest</button>
+      <button type="button" onClick={removeActiveQuestHandler}>
+        Remove active quest
+      </button>
       <button type="button" onClick={() => questService.removeAll()}>
         Remove all quests
       </button>

@@ -25,12 +25,16 @@ export function updateMarkerPopup(quest: IQuest) {
   quest.marker.getPopup().setHTML(content)
 }
 
-export function createMarker(quest: IQuest, map: Map, options?: CreateMarkerOptions): Marker {
+export function createMarker(
+  quest: IQuest,
+  map: Map,
+  options?: CreateMarkerOptions
+): Marker {
   const content = getMarkerPopupContent(quest)
   const popup = new Popup().setHTML(content)
 
   const marker = new Marker({
-    draggable: true,
+    draggable: true
   })
     .setLngLat(quest.location)
     .setPopup(popup)
@@ -44,11 +48,14 @@ export function createMarker(quest: IQuest, map: Map, options?: CreateMarkerOpti
     popup.on('close', () => options.onPopupClosed!())
   }
 
-  marker.on('drag', debounce(() => {
-    quest.location = marker.getLngLat()
-    const content = getMarkerPopupContent(quest)
-    popup.setHTML(content)
-  }, 100))
+  marker.on(
+    'drag',
+    debounce(() => {
+      quest.location = marker.getLngLat()
+      const content = getMarkerPopupContent(quest)
+      popup.setHTML(content)
+    }, 100)
+  )
 
   return marker
 }
