@@ -5,7 +5,7 @@ import mapboxgl, { Map as MapboxMap, Marker } from 'mapbox-gl'
 import { MapContext } from '@/App'
 import QuestService from '@services/quest'
 
-import { createMarker, CreateMarkerOptions } from '@helpers/marker'
+import { createMarker, createCluster, CreateMarkerOptions } from '@helpers/marker'
 
 import style from './Map.module.css'
 import '~mapbox-gl-style'
@@ -18,10 +18,42 @@ function Map() {
   const [lng, setLng] = useState(-70.9)
   const [lat, setLat] = useState(42.35)
   const [zoom, setZoom] = useState(9)
-  const [markers] = useState<Marker[]>([])
+  const zoomBelowThreshold = zoom < 8
+  const [clusterMarkers] = useState<Marker[]>([])
   const [activeMarker, setActiveMarker] = useState<Marker | null>(null)
 
   const questService = useContext<QuestService>(MapContext)
+
+  const createMarkerOptions: CreateMarkerOptions = {
+    onPopupOpened: (marker) => setActiveMarker(marker),
+    onPopupClosed: () => setActiveMarker(null)
+  }
+
+  useEffect(() => {
+    if (map.current) {
+      if (zoomBelowThreshold) {
+        clusterMarkers.splice(0)
+
+        for (const cluster of questService.getClusters({ meters: 20000 })) {
+          for (const quest of cluster) {
+            quest.marker.remove()
+          }
+
+          const clusterMarker = createCluster(cluster, map.current!)
+          clusterMarkers.push(clusterMarker)
+        }
+      } else {
+        for (const clusterMarker of clusterMarkers) {
+          clusterMarker.remove()
+        }
+
+        for (const quest of questService.getAll()) {
+          const marker = createMarker(quest, map.current!, createMarkerOptions)
+          quest.marker = marker
+        }
+      }
+    }
+  }, [zoomBelowThreshold])
 
   useEffect(() => {
     if (map.current) return
@@ -38,17 +70,11 @@ function Map() {
       setZoom(map.current!.getZoom())
     })
 
-    const createMarkerOptions: CreateMarkerOptions = {
-      onPopupOpened: (marker) => setActiveMarker(marker),
-      onPopupClosed: () => setActiveMarker(null)
-    }
-
-    for (const quest of questService.getAll()) {
-      const marker = createMarker(quest, map.current!, createMarkerOptions)
-      quest.marker = marker
-    }
-
     map.current.on('click', (e) => {
+      if (zoomBelowThreshold) {
+        return
+      }
+
       const nearest = questService.getNearest(e.lngLat, {
         map: map.current!,
         pixels: 36
@@ -56,17 +82,7 @@ function Map() {
 
       if (nearest) {
         if (e.originalEvent.button === 3) {
-          const foundMarker = markers.find((m) => {
-            const lngLat = m.getLngLat()
-            return (
-              lngLat.lat === nearest.location.lat &&
-              lngLat.lng === nearest.location.lng
-            )
-          })
-
-          if (foundMarker) {
-            foundMarker.remove()
-          }
+          nearest.marker.remove()
         }
 
         return

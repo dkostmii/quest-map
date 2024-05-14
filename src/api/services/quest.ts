@@ -142,6 +142,35 @@ class QuestService {
     return this.quests
   }
 
+  getClusters(withinRadius: Radius): IQuest[][] {
+    const clusters: IQuest[][] = []
+
+    if ('meters' in withinRadius) {
+      for (const questA of this.quests) {
+        const cluster = this.quests.filter(questB => (
+          questB.location.distanceTo(questA.location) < withinRadius.meters
+        ))
+
+        clusters.push(cluster)
+      }
+    } else {
+      for (const questA of this.quests) {
+        const cluster = this.quests.filter(questB => {
+          const projQuestALocation = withinRadius.map.project(questA.location)
+          const projQuestBLocation = withinRadius.map.project(questB.location)
+
+          const distancePixels = projQuestALocation.dist(projQuestBLocation)
+
+          return distancePixels < withinRadius.pixels
+        })
+
+        clusters.push(cluster)
+      }
+    }
+
+    return clusters
+  }
+
   findByMarker(marker: Marker) {
     return this.quests.find(q => q.marker === marker)
   }
