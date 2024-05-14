@@ -9,6 +9,8 @@ export default defineConfig({
     alias: {
       '@': path.resolve(__dirname, './src'),
       '@components': path.resolve(__dirname, './src/components'),
+      '@services': path.resolve(__dirname, './src/api/services'),
+      '@helpers': path.resolve(__dirname, './src/helpers'),
       '~mapbox-gl-style': path.resolve(__dirname, 'node_modules/mapbox-gl/dist/mapbox-gl.css')
     }
   }

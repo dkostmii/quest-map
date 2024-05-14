@@ -29,6 +29,12 @@
       ],
       "@components/*": [
         "src/components/*"
+      ],
+      "@services/*": [
+        "src/api/services/*"
+      ],
+      "@helpers/*": [
+        "src/helpers/*"
       ]
     }
   },
