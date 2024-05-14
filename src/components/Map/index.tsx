@@ -7,7 +7,6 @@ import '~mapbox-gl-style'
 
 mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN
 
-
 function Map() {
   const map = useRef(null)
   const mapContainer = useRef(null)
