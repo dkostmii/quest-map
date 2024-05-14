@@ -11,11 +11,13 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "lodash.debounce": "^4.0.8",
     "mapbox-gl": "^3.3.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
   "devDependencies": {
+    "@types/lodash.debounce": "^4.0.9",
     "@types/mapbox-gl": "^3.1.0",
     "@types/react": "^18.2.66",
     "@types/react-dom": "^18.2.22",
