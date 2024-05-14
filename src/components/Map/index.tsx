@@ -5,7 +5,11 @@ import mapboxgl, { Map as MapboxMap, Marker } from 'mapbox-gl'
 import { MapContext } from '@/App'
 import QuestService from '@services/quest'
 
-import { createMarker, createCluster, CreateMarkerOptions } from '@helpers/marker'
+import {
+  createMarker,
+  createCluster,
+  CreateMarkerOptions
+} from '@helpers/marker'
 
 import style from './Map.module.css'
 import '~mapbox-gl-style'

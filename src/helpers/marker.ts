@@ -63,10 +63,10 @@ export function createMarker(
 function getClusterMarker(cluster: IQuest[]): Marker {
   const count = cluster.length
 
-  const el = document.createElement("div")
-  el.classList.add("cluster-marker")
+  const el = document.createElement('div')
+  el.classList.add('cluster-marker')
 
-  const caption = document.createElement("span")
+  const caption = document.createElement('span')
   caption.appendChild(document.createTextNode(count.toString()))
   el.appendChild(caption)
 
@@ -75,11 +75,14 @@ function getClusterMarker(cluster: IQuest[]): Marker {
   })
 
   if (count > 0) {
-    const clusterCenter = cluster.reduce((acc, quest) => {
-      const { lng, lat } = quest.location
-      const { lng: accLng, lat: accLat } = acc
-      return { lng: lng + accLng, lat: lat + accLat }
-    }, { lng: 0, lat: 0 })
+    const clusterCenter = cluster.reduce(
+      (acc, quest) => {
+        const { lng, lat } = quest.location
+        const { lng: accLng, lat: accLat } = acc
+        return { lng: lng + accLng, lat: lat + accLat }
+      },
+      { lng: 0, lat: 0 }
+    )
 
     clusterCenter.lng /= count
     clusterCenter.lat /= count
@@ -90,10 +93,7 @@ function getClusterMarker(cluster: IQuest[]): Marker {
   return marker
 }
 
-export function createCluster(
-  cluster: IQuest[],
-  map: Map
-) {
+export function createCluster(cluster: IQuest[], map: Map) {
   const marker = getClusterMarker(cluster)
   marker.addTo(map)
 
