@@ -10,9 +10,9 @@ mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN
 function Map() {
   const map = useRef<MapboxMap | null>(null)
   const mapContainer = useRef<HTMLDivElement | null>(null)
-  const [lng] = useState(-70.9)
-  const [lat] = useState(42.35)
-  const [zoom] = useState(9)
+  const [lng, setLng] = useState(-70.9)
+  const [lat, setLat] = useState(42.35)
+  const [zoom, setZoom] = useState(9)
 
   useEffect(() => {
     if (map.current) return
@@ -22,10 +22,19 @@ function Map() {
       center: [lng, lat],
       zoom: zoom
     })
+
+    map.current.on('move', () => {
+      setLng(map.current!.getCenter().lng);
+      setLat(map.current!.getCenter().lat);
+      setZoom(map.current!.getZoom());
+    });
   }, [lng, lat, zoom])
 
   return (
     <div>
+      <div className={style.sidebar}>
+        Longitude: {lng.toFixed(4)} | Latitude: {lat.toFixed(4)} | Zoom: {zoom.toFixed(2)}
+      </div>
       <div ref={mapContainer} className={style.container} />
     </div>
   )
