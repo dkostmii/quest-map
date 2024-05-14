@@ -24,16 +24,17 @@ function Map() {
     })
 
     map.current.on('move', () => {
-      setLng(map.current!.getCenter().lng);
-      setLat(map.current!.getCenter().lat);
-      setZoom(map.current!.getZoom());
-    });
+      setLng(map.current!.getCenter().lng)
+      setLat(map.current!.getCenter().lat)
+      setZoom(map.current!.getZoom())
+    })
   }, [lng, lat, zoom])
 
   return (
     <div>
       <div className={style.sidebar}>
-        Longitude: {lng.toFixed(4)} | Latitude: {lat.toFixed(4)} | Zoom: {zoom.toFixed(2)}
+        Longitude: {lng.toFixed(4)} | Latitude: {lat.toFixed(4)} | Zoom:{' '}
+        {zoom.toFixed(2)}
       </div>
       <div ref={mapContainer} className={style.container} />
     </div>
