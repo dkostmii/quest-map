@@ -1,6 +1,6 @@
 import { useRef, useEffect, useState, useContext } from 'react'
 
-import mapboxgl, { Map as MapboxMap, Marker, Popup } from 'mapbox-gl'
+import mapboxgl, { Map as MapboxMap, Marker } from 'mapbox-gl'
 
 import { MapContext } from '@/App'
 import QuestService from '@services/quest'
