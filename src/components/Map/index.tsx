@@ -53,6 +53,7 @@ function Map() {
         }
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [zoomBelowThreshold])
 
   useEffect(() => {
