@@ -46,7 +46,9 @@ function Map() {
           marker.remove()
         }
 
-        for (const cluster of questService.getClusters({ meters: collisionRadiusMeters })) {
+        for (const cluster of questService.getClusters({
+          meters: collisionRadiusMeters
+        })) {
           const clusterMarker = createCluster(cluster, map.current!)
           clusterMarkers.push(clusterMarker)
         }
@@ -90,11 +92,7 @@ function Map() {
 
     questService.getAll().then((quests) => {
       for (const quest of quests) {
-        const marker = createMarker(
-          quest,
-          map.current!,
-          createMarkerOptions
-        )
+        const marker = createMarker(quest, map.current!, createMarkerOptions)
         quest.marker = marker
         markers.push(marker)
       }
@@ -149,7 +147,10 @@ function Map() {
         Remove all quests
       </button>
       <p>Zoom out below {zoomThreshold} to see the clusters</p>
-      <p>Quests that are less than {collisionRadiusMeters} meters between each other are merged into cluster</p>
+      <p>
+        Quests that are less than {collisionRadiusMeters} meters between each
+        other are merged into cluster
+      </p>
       <div ref={mapContainer} className={style.container} />
       <div className={style.sidebar}>
         Longitude: {lng.toFixed(4)} | Latitude: {lat.toFixed(4)} | Zoom:{' '}
