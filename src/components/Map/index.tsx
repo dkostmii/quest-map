@@ -26,6 +26,7 @@ function Map() {
   const [zoom, setZoom] = useState(9)
   const zoomBelowThreshold = zoom < zoomThreshold
   const [clusterMarkers] = useState<Marker[]>([])
+  const [markers] = useState<Marker[]>([])
   const [activeMarker, setActiveMarker] = useState<Marker | null>(null)
 
   const questService = useContext<QuestService>(MapContext)
@@ -41,11 +42,11 @@ function Map() {
       if (zoomBelowThreshold) {
         clusterMarkers.splice(0)
 
-        for (const cluster of questService.getClusters({ meters: collisionRadiusMeters })) {
-          for (const quest of cluster) {
-            quest.marker?.remove()
-          }
+        for (const marker of markers) {
+          marker.remove()
+        }
 
+        for (const cluster of questService.getClusters({ meters: collisionRadiusMeters })) {
           const clusterMarker = createCluster(cluster, map.current!)
           clusterMarkers.push(clusterMarker)
         }
@@ -53,6 +54,8 @@ function Map() {
         for (const clusterMarker of clusterMarkers) {
           clusterMarker.remove()
         }
+
+        markers.splice(0)
 
         questService.getAll().then((quests) => {
           for (const quest of quests) {
@@ -62,6 +65,7 @@ function Map() {
               createMarkerOptions
             )
             quest.marker = marker
+            markers.push(marker)
           }
         })
       }
@@ -84,7 +88,17 @@ function Map() {
       setZoom(map.current!.getZoom())
     })
 
-    questService.getAll()
+    questService.getAll().then((quests) => {
+      for (const quest of quests) {
+        const marker = createMarker(
+          quest,
+          map.current!,
+          createMarkerOptions
+        )
+        quest.marker = marker
+        markers.push(marker)
+      }
+    })
 
     map.current.on('click', async (e) => {
       if (zoomBelowThreshold) {
