@@ -1,4 +1,3 @@
-import type { Firestore } from 'firebase/firestore'
 import { initializeApp } from "firebase/app"
 import { getFirestore } from "firebase/firestore"
 
