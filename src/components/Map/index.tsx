@@ -52,9 +52,13 @@ function Map() {
           clusterMarker.remove()
         }
 
-        questService.getAll().then(quests => {
+        questService.getAll().then((quests) => {
           for (const quest of quests) {
-            const marker = createMarker(quest, map.current!, createMarkerOptions)
+            const marker = createMarker(
+              quest,
+              map.current!,
+              createMarkerOptions
+            )
             quest.marker = marker
           }
         })
@@ -118,7 +122,12 @@ function Map() {
       <button type="button" onClick={removeActiveQuestHandler}>
         Remove active quest
       </button>
-      <button type="button" onClick={async () => { await questService.removeAll() }}>
+      <button
+        type="button"
+        onClick={async () => {
+          await questService.removeAll()
+        }}
+      >
         Remove all quests
       </button>
       <div className={style.sidebar}>
