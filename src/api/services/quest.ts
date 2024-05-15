@@ -261,6 +261,8 @@ class QuestService {
       this.quests = quests
     }
 
+    this.dbLoaded = true
+
     return this.quests
   }
 
