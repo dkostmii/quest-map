@@ -15,6 +15,8 @@ import style from './Map.module.css'
 import '~mapbox-gl-style'
 
 mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN
+const zoomThreshold = 8
+const collisionRadiusMeters = 20000
 
 function Map() {
   const map = useRef<MapboxMap | null>(null)
@@ -22,7 +24,7 @@ function Map() {
   const [lng, setLng] = useState(-70.9)
   const [lat, setLat] = useState(42.35)
   const [zoom, setZoom] = useState(9)
-  const zoomBelowThreshold = zoom < 8
+  const zoomBelowThreshold = zoom < zoomThreshold
   const [clusterMarkers] = useState<Marker[]>([])
   const [activeMarker, setActiveMarker] = useState<Marker | null>(null)
 
@@ -39,7 +41,7 @@ function Map() {
       if (zoomBelowThreshold) {
         clusterMarkers.splice(0)
 
-        for (const cluster of questService.getClusters({ meters: 20000 })) {
+        for (const cluster of questService.getClusters({ meters: collisionRadiusMeters })) {
           for (const quest of cluster) {
             quest.marker?.remove()
           }
@@ -81,6 +83,8 @@ function Map() {
       setLat(map.current!.getCenter().lat)
       setZoom(map.current!.getZoom())
     })
+
+    questService.getAll()
 
     map.current.on('click', async (e) => {
       if (zoomBelowThreshold) {
@@ -130,11 +134,13 @@ function Map() {
       >
         Remove all quests
       </button>
+      <p>Zoom out below {zoomThreshold} to see the clusters</p>
+      <p>Quests that are less than {collisionRadiusMeters} meters between each other are merged into cluster</p>
+      <div ref={mapContainer} className={style.container} />
       <div className={style.sidebar}>
         Longitude: {lng.toFixed(4)} | Latitude: {lat.toFixed(4)} | Zoom:{' '}
         {zoom.toFixed(2)}
       </div>
-      <div ref={mapContainer} className={style.container} />
     </div>
   )
 }
