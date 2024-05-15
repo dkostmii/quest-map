@@ -30,7 +30,8 @@ function Map() {
 
   const createMarkerOptions: CreateMarkerOptions = {
     onPopupOpened: (marker) => setActiveMarker(marker),
-    onPopupClosed: () => setActiveMarker(null)
+    onPopupClosed: () => setActiveMarker(null),
+    onMarkerDragEnd: async (quest) => await questService.updateQuest(quest)
   }
 
   useEffect(() => {
@@ -40,7 +41,7 @@ function Map() {
 
         for (const cluster of questService.getClusters({ meters: 20000 })) {
           for (const quest of cluster) {
-            quest.marker.remove()
+            quest.marker?.remove()
           }
 
           const clusterMarker = createCluster(cluster, map.current!)
@@ -51,10 +52,12 @@ function Map() {
           clusterMarker.remove()
         }
 
-        for (const quest of questService.getAll()) {
-          const marker = createMarker(quest, map.current!, createMarkerOptions)
-          quest.marker = marker
-        }
+        questService.getAll().then(quests => {
+          for (const quest of quests) {
+            const marker = createMarker(quest, map.current!, createMarkerOptions)
+            quest.marker = marker
+          }
+        })
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -75,7 +78,7 @@ function Map() {
       setZoom(map.current!.getZoom())
     })
 
-    map.current.on('click', (e) => {
+    map.current.on('click', async (e) => {
       if (zoomBelowThreshold) {
         return
       }
@@ -87,24 +90,24 @@ function Map() {
 
       if (nearest) {
         if (e.originalEvent.button === 3) {
-          nearest.marker.remove()
+          nearest.marker?.remove()
         }
 
         return
       }
 
-      const quest = questService.add(e.lngLat)
+      const quest = await questService.add(e.lngLat)
       quest.marker = createMarker(quest, map.current!, createMarkerOptions)
     })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  const removeActiveQuestHandler = () => {
+  const removeActiveQuestHandler = async () => {
     if (activeMarker) {
       const quest = questService.findByMarker(activeMarker)
 
       if (quest) {
-        questService.remove(quest)
+        await questService.remove(quest)
       }
     }
   }
@@ -115,7 +118,7 @@ function Map() {
       <button type="button" onClick={removeActiveQuestHandler}>
         Remove active quest
       </button>
-      <button type="button" onClick={() => questService.removeAll()}>
+      <button type="button" onClick={async () => { await questService.removeAll() }}>
         Remove all quests
       </button>
       <div className={style.sidebar}>

@@ -6,6 +6,7 @@ import type { IQuest } from '@services/quest'
 export interface CreateMarkerOptions {
   onPopupOpened?: (marker: Marker) => void
   onPopupClosed?: () => void
+  onMarkerDragEnd?: (quest: IQuest) => void
 }
 
 function getMarkerPopupContent(quest: IQuest) {
@@ -46,6 +47,10 @@ export function createMarker(
 
   if (options && options.onPopupClosed) {
     popup.on('close', () => options.onPopupClosed!())
+  }
+
+  if (options && options.onMarkerDragEnd) {
+    marker.on('dragend', () => options.onMarkerDragEnd!(quest))
   }
 
   marker.on(
