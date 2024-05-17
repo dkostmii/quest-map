@@ -1,6 +1,6 @@
 import { LngLat, Marker } from 'mapbox-gl'
 
-import { updateMarkerPopup } from '@helpers/marker'
+import MarkerHelper from '@helpers/marker'
 import DatabaseService from '@services/database'
 import type { IQuest, Radius } from '@typing/quest'
 
@@ -76,7 +76,7 @@ class QuestService {
     let current: IQuest | undefined = quest
 
     while (current) {
-      updateMarkerPopup(quest)
+      MarkerHelper.updateMarkerPopup(quest)
 
       current = current.next
     }

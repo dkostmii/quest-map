@@ -4,11 +4,9 @@ import mapboxgl, { Map as MapboxMap, Marker } from 'mapbox-gl'
 
 import useQuestService from '@hooks/quest'
 
-import {
-  createMarker,
-  createCluster,
-  CreateMarkerOptions
-} from '@helpers/marker'
+import MarkerHelper from '@helpers/marker'
+import ClusterHelper from '@helpers/cluster'
+import { CreateMarkerOptions } from '@typing/createMarker'
 
 import style from './Map.module.css'
 import '~mapbox-gl-style'
@@ -48,7 +46,10 @@ function Map() {
         })
 
         clusters.forEach((cluster) => {
-          const clusterMarker = createCluster(cluster, map.current!)
+          const clusterMarker = ClusterHelper.createCluster(
+            cluster,
+            map.current!
+          )
           clusterMarkers.push(clusterMarker)
         })
       } else {
@@ -57,7 +58,7 @@ function Map() {
 
         questService.getAll().then((quests) => {
           quests.forEach((quest) => {
-            const marker = createMarker(
+            const marker = MarkerHelper.createMarker(
               quest,
               map.current!,
               createMarkerOptions
@@ -101,7 +102,11 @@ function Map() {
       }
 
       const quest = await questService.add(e.lngLat)
-      quest.marker = createMarker(quest, map.current!, createMarkerOptions)
+      quest.marker = MarkerHelper.createMarker(
+        quest,
+        map.current!,
+        createMarkerOptions
+      )
       markers.push(quest.marker)
     })
     // eslint-disable-next-line react-hooks/exhaustive-deps
