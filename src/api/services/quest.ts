@@ -1,109 +1,15 @@
-import type { DocumentReference, Firestore } from 'firebase/firestore'
-import { doc, collection, writeBatch, getDocs, query, Timestamp, GeoPoint } from 'firebase/firestore'
 import { LngLat, Marker } from 'mapbox-gl'
 
 import { updateMarkerPopup } from '@helpers/marker'
-import type { IQuest, IQuestData, Radius } from '@typing/quest'
+import DatabaseService from '@services/database'
+import type { IQuest, Radius } from '@typing/quest'
 
-async function updateDatabase(db: Firestore, quests: IQuest[]) {
-  const snapshot = await getDocs(query(collection(db, 'quests')))
-
-  if (snapshot.size) {
-    console.debug(`Found ${snapshot.size} documents in database. Deleting them...`)
-
-    try {
-      const deleteBatch = writeBatch(db)
-
-      snapshot.forEach((docSnapshot) => {
-        deleteBatch.delete(docSnapshot.ref)
-      })
-
-      await deleteBatch.commit()
-      console.debug("Successfully cleaned quests database!")
-    } catch (e) {
-      console.error("Error while cleaning quests database:", e)
-    }
-  }
-
-  try {
-    const setBatch = writeBatch(db)
-    const descSortedQuests = [...quests].sort((a, b) => b.id - a.id)
-    let prevQuestDocRef: DocumentReference | null = null
-
-    descSortedQuests.forEach((quest) => {
-      const questDocRef = doc(collection(db, 'quests'))
-
-      const timestampMillis = new Date(quest.timestamp).getTime()
-      const timestampSeconds = Math.floor(timestampMillis / 1000)
-      const timestampNanosec = (timestampMillis - timestampSeconds * 1000) * 1_000_000
-
-      const data: IQuestData = {
-        quest_id: quest.id,
-        location: new GeoPoint(quest.location.lat, quest.location.lng),
-        timestamp: new Timestamp(timestampSeconds, timestampNanosec),
-        next: null
-      }
-
-      if (quest.next) {
-        data.next = prevQuestDocRef
-      }
-
-      setBatch.set(questDocRef, data)
-      prevQuestDocRef = questDocRef
-    })
-
-    await setBatch.commit()
-    console.debug("Successfully added quests to database!")
-  }
-  catch (e) {
-    console.error("Error adding quests to database:", e)
-  }
-}
-
-async function loadDatabase(db: Firestore): Promise<IQuest[] | undefined> {
-  try {
-    const snapshot = await getDocs(query(collection(db, 'quests')))
-    const quests: IQuest[] = []
-
-    snapshot.forEach((docSnapshot) => {
-      const data = docSnapshot.data() as IQuestData
-      const nextRef = data.next
-      const nextSnapshot = nextRef ? snapshot.docs.find((s) => s.id === nextRef!.id) : null
-
-      const quest: IQuest = {
-        id: data.quest_id,
-        location: new LngLat(data.location.longitude, data.location.latitude),
-        timestamp: data.timestamp.toDate().toISOString()
-      }
-
-      if (nextSnapshot) {
-        const nextData = nextSnapshot.data() as IQuestData
-        const nextQuest: IQuest = {
-          id: nextData.quest_id,
-          location: new LngLat(nextData.location.longitude, nextData.location.latitude),
-          timestamp: nextData.timestamp.toDate().toISOString()
-        }
-
-        quest.next = nextQuest
-      }
-
-      quests.push(quest)
-    })
-
-    return quests
-  } catch (e) {
-    console.error("Error loading database", e)
-  }
-}
 
 class QuestService {
   private quests: IQuest[] = []
-  private db: Firestore
   private dbLoaded: boolean = false
 
-  constructor(db: Firestore) {
-    this.db = db
-  }
+  constructor(private db: DatabaseService) { }
 
   async add(location: LngLat): Promise<IQuest> {
     const lastQuest = this.quests.length > 0 ? this.quests[this.quests.length - 1] : null
@@ -121,7 +27,7 @@ class QuestService {
     this.quests.push(newQuest)
     console.debug("Added quest:", newQuest)
 
-    await updateDatabase(this.db, this.quests)
+    await this.db.updateDatabase(this.quests)
 
     return newQuest
   }
@@ -148,7 +54,7 @@ class QuestService {
 
     quest.marker?.remove()
 
-    await updateDatabase(this.db, this.quests)
+    await this.db.updateDatabase(this.quests)
 
     console.debug("Removed quest:", quest)
   }
@@ -182,7 +88,7 @@ class QuestService {
     }
 
     this.quests.splice(0)
-    await updateDatabase(this.db, this.quests)
+    await this.db.updateDatabase(this.quests)
 
     console.debug("Removed all quests")
   }
@@ -234,7 +140,7 @@ class QuestService {
     }
 
     console.debug("Getting all quests from database...")
-    const quests = await loadDatabase(this.db)
+    const quests = await this.db.loadDatabase()
 
     if (quests) {
       this.quests = quests
@@ -250,7 +156,7 @@ class QuestService {
       return
     }
 
-    await updateDatabase(this.db, this.quests)
+    await this.db.updateDatabase(this.quests)
     return quest
   }
 
