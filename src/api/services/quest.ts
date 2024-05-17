@@ -1,31 +1,9 @@
-import type { Firestore, DocumentReference } from 'firebase/firestore'
+import type { Firestore } from 'firebase/firestore'
 import { doc, collection, writeBatch, getDocs, query, Timestamp, GeoPoint } from 'firebase/firestore'
-
-import { LngLat, Map, Marker } from 'mapbox-gl'
+import { LngLat, Marker } from 'mapbox-gl'
 
 import { updateMarkerPopup } from '@helpers/marker'
-
-export interface IQuest {
-  id: number
-  location: LngLat
-  timestamp: string
-  marker?: Marker
-  next?: IQuest
-}
-
-interface IQuestData {
-  quest_id: number,
-  location: GeoPoint,
-  timestamp: Timestamp,
-  next: DocumentReference | null
-}
-
-type Radius = {
-  meters: number
-} | {
-  pixels: number
-  map: Map
-}
+import type { IQuest, IQuestData, Radius } from '@typing/quest'
 
 async function updateDatabase(db: Firestore, quests: IQuest[]) {
   const snapshot = await getDocs(query(collection(db, 'quests')))

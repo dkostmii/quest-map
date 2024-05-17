@@ -12,6 +12,7 @@ export default defineConfig({
       '@services': path.resolve(__dirname, './src/api/services'),
       '@helpers': path.resolve(__dirname, './src/helpers'),
       '@hooks': path.resolve(__dirname, './src/hooks'),
+      '@typing': path.resolve(__dirname, './src/typing'),
       '~mapbox-gl-style': path.resolve(__dirname, 'node_modules/mapbox-gl/dist/mapbox-gl.css')
     }
   }

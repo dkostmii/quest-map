@@ -1,7 +1,7 @@
 import { Map, Marker, Popup } from 'mapbox-gl'
 import debounce from 'lodash.debounce'
 
-import type { IQuest } from '@services/quest'
+import type { IQuest } from '@typing/quest'
 
 export interface CreateMarkerOptions {
   onPopupOpened?: (marker: Marker) => void
