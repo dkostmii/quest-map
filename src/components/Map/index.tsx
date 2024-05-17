@@ -86,14 +86,6 @@ function Map() {
       setZoom(map.current!.getZoom())
     })
 
-    questService.getAll().then((quests) => {
-      quests.forEach((quest) => {
-        const marker = createMarker(quest, map.current!, createMarkerOptions)
-        quest.marker = marker
-        markers.push(marker)
-      })
-    })
-
     map.current.on('click', async (e) => {
       if (zoomBelowThreshold) {
         return
