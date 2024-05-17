@@ -131,12 +131,7 @@ function Map() {
       <button type="button" onClick={removeActiveQuestHandler}>
         Remove active quest
       </button>
-      <button
-        type="button"
-        onClick={async () => {
-          await questService.removeAll()
-        }}
-      >
+      <button type="button" onClick={questService.removeAll.bind(questService)}>
         Remove all quests
       </button>
       <p>Zoom out below {zoomThreshold} to see the clusters</p>
