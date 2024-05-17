@@ -105,10 +105,6 @@ function Map() {
       })
 
       if (nearest) {
-        if (e.originalEvent.button === 3) {
-          nearest.marker?.remove()
-        }
-
         return
       }
 
