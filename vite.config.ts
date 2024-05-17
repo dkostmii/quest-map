@@ -11,6 +11,7 @@ export default defineConfig({
       '@components': path.resolve(__dirname, './src/components'),
       '@services': path.resolve(__dirname, './src/api/services'),
       '@helpers': path.resolve(__dirname, './src/helpers'),
+      '@hooks': path.resolve(__dirname, './src/hooks'),
       '~mapbox-gl-style': path.resolve(__dirname, 'node_modules/mapbox-gl/dist/mapbox-gl.css')
     }
   }

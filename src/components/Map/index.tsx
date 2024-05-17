@@ -1,9 +1,8 @@
-import { useRef, useEffect, useState, useContext } from 'react'
+import { useRef, useEffect, useState } from 'react'
 
 import mapboxgl, { Map as MapboxMap, Marker } from 'mapbox-gl'
 
-import { MapContext } from '@/App'
-import QuestService from '@services/quest'
+import useQuestService from '@hooks/quest'
 
 import {
   createMarker,
@@ -29,7 +28,7 @@ function Map() {
   const [markers] = useState<Marker[]>([])
   const [activeMarker, setActiveMarker] = useState<Marker | null>(null)
 
-  const questService = useContext<QuestService>(MapContext)
+  const questService = useQuestService()
 
   const createMarkerOptions: CreateMarkerOptions = {
     onPopupOpened: (marker) => setActiveMarker(marker),
