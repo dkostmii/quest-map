@@ -1,4 +1,4 @@
-import type { Firestore } from 'firebase/firestore'
+import type { DocumentReference, Firestore } from 'firebase/firestore'
 import { doc, collection, writeBatch, getDocs, query, Timestamp, GeoPoint } from 'firebase/firestore'
 import { LngLat, Marker } from 'mapbox-gl'
 
@@ -28,9 +28,9 @@ async function updateDatabase(db: Firestore, quests: IQuest[]) {
   try {
     const setBatch = writeBatch(db)
     const descSortedQuests = [...quests].sort((a, b) => b.id - a.id)
-    let prevQuestDocRef = null
+    let prevQuestDocRef: DocumentReference | null = null
 
-    for (const quest of descSortedQuests) {
+    descSortedQuests.forEach((quest) => {
       const questDocRef = doc(collection(db, 'quests'))
 
       const timestampMillis = new Date(quest.timestamp).getTime()
@@ -50,7 +50,8 @@ async function updateDatabase(db: Firestore, quests: IQuest[]) {
 
       setBatch.set(questDocRef, data)
       prevQuestDocRef = questDocRef
-    }
+    })
+
     await setBatch.commit()
     console.debug("Successfully added quests to database!")
   }
@@ -192,12 +193,12 @@ class QuestService {
 
     if (this.quests.length === 0) return null
 
-    for (const quest of this.quests) {
+    this.quests.forEach((quest) => {
       const distance = location.distanceTo(quest.location)
 
       if (withinRadius) {
         if ('meters' in withinRadius) {
-          if (distance > withinRadius.meters) continue
+          if (distance > withinRadius.meters) return
         }
 
         if ('pixels' in withinRadius) {
@@ -206,20 +207,20 @@ class QuestService {
 
           const distancePixels = projLocation.dist(projQuestLocation)
 
-          if (distancePixels > withinRadius.pixels) continue
+          if (distancePixels > withinRadius.pixels) return
         }
       }
 
       if (!nearestSoFar) {
         nearestSoFar = quest
-        continue
+        return
       }
 
       if (distance < minDistance) {
         nearestSoFar = quest
         minDistance = distance
       }
-    }
+    })
 
     console.debug("Found nearest quest:", nearestSoFar)
 
@@ -257,15 +258,15 @@ class QuestService {
     const clusters: IQuest[][] = []
 
     if ('meters' in withinRadius) {
-      for (const questA of this.quests) {
+      this.quests.forEach((questA) => {
         const cluster = this.quests.filter(questB => (
           questB.location.distanceTo(questA.location) < withinRadius.meters
         ))
 
         clusters.push(cluster)
-      }
+      })
     } else {
-      for (const questA of this.quests) {
+      this.quests.forEach((questA) => {
         const cluster = this.quests.filter(questB => {
           const projQuestALocation = withinRadius.map.project(questA.location)
           const projQuestBLocation = withinRadius.map.project(questB.location)
@@ -276,7 +277,7 @@ class QuestService {
         })
 
         clusters.push(cluster)
-      }
+      })
     }
 
     return clusters

@@ -41,25 +41,22 @@ function Map() {
       if (zoomBelowThreshold) {
         clusterMarkers.splice(0)
 
-        for (const marker of markers) {
-          marker.remove()
-        }
+        markers.forEach((marker) => marker.remove())
 
-        for (const cluster of questService.getClusters({
+        const clusters = questService.getClusters({
           meters: collisionRadiusMeters
-        })) {
+        })
+
+        clusters.forEach((cluster) => {
           const clusterMarker = createCluster(cluster, map.current!)
           clusterMarkers.push(clusterMarker)
-        }
+        })
       } else {
-        for (const clusterMarker of clusterMarkers) {
-          clusterMarker.remove()
-        }
-
+        clusterMarkers.forEach((marker) => marker.remove())
         markers.splice(0)
 
         questService.getAll().then((quests) => {
-          for (const quest of quests) {
+          quests.forEach((quest) => {
             const marker = createMarker(
               quest,
               map.current!,
@@ -67,7 +64,7 @@ function Map() {
             )
             quest.marker = marker
             markers.push(marker)
-          }
+          })
         })
       }
     }
@@ -90,11 +87,11 @@ function Map() {
     })
 
     questService.getAll().then((quests) => {
-      for (const quest of quests) {
+      quests.forEach((quest) => {
         const marker = createMarker(quest, map.current!, createMarkerOptions)
         quest.marker = marker
         markers.push(marker)
-      }
+      })
     })
 
     map.current.on('click', async (e) => {
