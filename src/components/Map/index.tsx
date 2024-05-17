@@ -114,6 +114,7 @@ function Map() {
 
       const quest = await questService.add(e.lngLat)
       quest.marker = createMarker(quest, map.current!, createMarkerOptions)
+      markers.push(quest.marker)
     })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
