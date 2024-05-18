@@ -41,6 +41,9 @@
       ],
       "@typing/*": [
         "src/typing/*"
+      ],
+      "@data/*": [
+        "src/data/*"
       ]
     }
   },

@@ -13,18 +13,18 @@ import Loader from './Loader'
 import RemoveButtons from './RemoveButtons'
 import InfoPanel from './InfoPanel'
 
+import mapSettings from '@data/mapSettings.json'
+
 import style from './Map.module.css'
 import '~mapbox-gl-style'
 
 mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN
-const zoomThreshold = 8
-const collisionRadiusMeters = 20000
-const nearestMarkerClickRadiusPixels = 36
+const { defaults, ...settings } = mapSettings
 
 function Map() {
-  const [lng, setLng] = useState(-70.9)
-  const [lat, setLat] = useState(42.35)
-  const [zoom, setZoom] = useState(9)
+  const [lng, setLng] = useState(defaults.location.lng)
+  const [lat, setLat] = useState(defaults.location.lat)
+  const [zoom, setZoom] = useState(defaults.zoom)
   const [isLoading, setIsLoading] = useState(true)
   const [clusterMarkers] = useState<Marker[]>([])
   const [markers] = useState<Marker[]>([])
@@ -40,7 +40,7 @@ function Map() {
     onMarkerDragEnd: async (quest) => await questService.updateQuest(quest)
   }
 
-  const zoomBelowThreshold = zoom < zoomThreshold
+  const zoomBelowThreshold = zoom < settings.zoomThreshold
 
   useEffect(() => {
     if (map.current) {
@@ -50,7 +50,7 @@ function Map() {
         markers.forEach((marker) => marker.remove())
 
         const clusters = questService.getClusters({
-          meters: collisionRadiusMeters
+          meters: settings.collisionRadiusMeters
         })
 
         clusters.forEach((cluster) => {
@@ -104,7 +104,7 @@ function Map() {
 
       const nearest = questService.getNearest(e.lngLat, {
         map: map.current!,
-        pixels: nearestMarkerClickRadiusPixels
+        pixels: settings.nearestMarkerClickRadiusPixels
       })
 
       if (nearest) {
@@ -145,8 +145,8 @@ function Map() {
   return (
     <div>
       <InfoPanel
-        zoomThreshold={zoomThreshold}
-        collisionRadiusMeters={collisionRadiusMeters}
+        zoomThreshold={settings.zoomThreshold}
+        collisionRadiusMeters={settings.collisionRadiusMeters}
       >
         <RemoveButtons
           onRemoveAllHandlerClicked={removeAllHandler}

@@ -1,0 +1,12 @@
+{
+  "zoomThreshold": 8,
+  "collisionRadiusMeters": 20000,
+  "nearestMarkerClickRadiusPixels": 36,
+  "defaults": {
+    "location": {
+      "lng": -70.9,
+      "lat": 42.35
+    },
+    "zoom": 9
+  }
+}

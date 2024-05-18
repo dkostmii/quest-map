@@ -13,6 +13,7 @@ export default defineConfig({
       '@helpers': path.resolve(__dirname, './src/helpers'),
       '@hooks': path.resolve(__dirname, './src/hooks'),
       '@typing': path.resolve(__dirname, './src/typing'),
+      '@data': path.resolve(__dirname, './src/data'),
       '~mapbox-gl-style': path.resolve(__dirname, 'node_modules/mapbox-gl/dist/mapbox-gl.css')
     }
   }
