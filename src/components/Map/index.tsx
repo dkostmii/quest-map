@@ -6,7 +6,12 @@ import useQuestService from '@hooks/quest'
 
 import MarkerHelper from '@helpers/marker'
 import ClusterHelper from '@helpers/cluster'
-import { CreateMarkerOptions } from '@typing/createMarker'
+import type { CreateMarkerOptions } from '@typing/createMarker'
+
+import Sidebar from './Sidebar'
+import Loader from './Loader'
+import RemoveButtons from './RemoveButtons'
+import InfoPanel from './InfoPanel'
 
 import style from './Map.module.css'
 import '~mapbox-gl-style'
@@ -14,19 +19,19 @@ import '~mapbox-gl-style'
 mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN
 const zoomThreshold = 8
 const collisionRadiusMeters = 20000
+const nearestMarkerClickRadiusPixels = 36
 
 function Map() {
-  const map = useRef<MapboxMap | null>(null)
-  const mapContainer = useRef<HTMLDivElement | null>(null)
   const [lng, setLng] = useState(-70.9)
   const [lat, setLat] = useState(42.35)
   const [zoom, setZoom] = useState(9)
   const [isLoading, setIsLoading] = useState(true)
-  const zoomBelowThreshold = zoom < zoomThreshold
   const [clusterMarkers] = useState<Marker[]>([])
   const [markers] = useState<Marker[]>([])
   const [activeMarker, setActiveMarker] = useState<Marker | null>(null)
 
+  const map = useRef<MapboxMap | null>(null)
+  const mapContainer = useRef<HTMLDivElement | null>(null)
   const questService = useQuestService()
 
   const createMarkerOptions: CreateMarkerOptions = {
@@ -34,6 +39,8 @@ function Map() {
     onPopupClosed: () => setActiveMarker(null),
     onMarkerDragEnd: async (quest) => await questService.updateQuest(quest)
   }
+
+  const zoomBelowThreshold = zoom < zoomThreshold
 
   useEffect(() => {
     if (map.current) {
@@ -97,7 +104,7 @@ function Map() {
 
       const nearest = questService.getNearest(e.lngLat, {
         map: map.current!,
-        pixels: 36
+        pixels: nearestMarkerClickRadiusPixels
       })
 
       if (nearest) {
@@ -137,24 +144,18 @@ function Map() {
 
   return (
     <div>
-      <p>Click on the map to add a quest</p>
-      <button type="button" onClick={removeActiveQuestHandler}>
-        Remove active quest
-      </button>
-      <button type="button" onClick={removeAllHandler}>
-        Remove all quests
-      </button>
-      <p>Zoom out below {zoomThreshold} to see the clusters</p>
-      <p>
-        Quests that are less than {collisionRadiusMeters} meters between each
-        other are merged into cluster
-      </p>
+      <InfoPanel
+        zoomThreshold={zoomThreshold}
+        collisionRadiusMeters={collisionRadiusMeters}
+      >
+        <RemoveButtons
+          onRemoveAllHandlerClicked={removeAllHandler}
+          onRemoveActiveQuestClicked={removeActiveQuestHandler}
+        />
+      </InfoPanel>
       <div className={style.container}>
-        <div className={style.sidebar}>
-          Longitude: {lng.toFixed(4)} | Latitude: {lat.toFixed(4)} | Zoom:{' '}
-          {zoom.toFixed(2)}
-        </div>
-        {isLoading && <div className={style.overlay}>Loading...</div>}
+        <Sidebar zoom={zoom} lng={lng} lat={lat} />
+        <Loader isLoading={isLoading} />
         <div ref={mapContainer} className={style.map} />
       </div>
     </div>
