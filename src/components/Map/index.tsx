@@ -136,10 +136,12 @@ function Map() {
         Quests that are less than {collisionRadiusMeters} meters between each
         other are merged into cluster
       </p>
-      <div ref={mapContainer} className={style.container} />
-      <div className={style.sidebar}>
-        Longitude: {lng.toFixed(4)} | Latitude: {lat.toFixed(4)} | Zoom:{' '}
-        {zoom.toFixed(2)}
+      <div className={style.container}>
+        <div className={style.sidebar}>
+          Longitude: {lng.toFixed(4)} | Latitude: {lat.toFixed(4)} | Zoom:{' '}
+          {zoom.toFixed(2)}
+        </div>
+        <div ref={mapContainer} className={style.map} />
       </div>
     </div>
   )

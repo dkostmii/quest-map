@@ -2,6 +2,10 @@
   height: 400px;
 }
 
+.map {
+  height: inherit;
+}
+
 .sidebar {
   background-color: rgb(35 55 75 / 90%);
   color: #fff;
@@ -9,4 +13,6 @@
   font-family: monospace;
   margin: 12px;
   border-radius: 4px;
+  position: absolute;
+  z-index: 1;
 }
