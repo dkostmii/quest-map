@@ -44,11 +44,12 @@ function Map() {
 
   useEffect(() => {
     if (map.current) {
+      clusterMarkers.forEach((marker) => marker.remove())
+      markers.forEach((marker) => marker.remove())
+      clusterMarkers.splice(0)
+      markers.splice(0)
+
       if (zoomBelowThreshold) {
-        clusterMarkers.splice(0)
-
-        markers.forEach((marker) => marker.remove())
-
         const clusters = questService.getClusters({
           meters: settings.collisionRadiusMeters
         })
@@ -61,9 +62,6 @@ function Map() {
           clusterMarkers.push(clusterMarker)
         })
       } else {
-        clusterMarkers.forEach((marker) => marker.remove())
-        markers.splice(0)
-
         setIsLoading(true)
         questService.getAll().then((quests) => {
           quests.forEach((quest) => {
@@ -120,6 +118,19 @@ function Map() {
         createMarkerOptions
       )
       markers.push(quest.marker)
+    })
+
+    questService.getAll().then((quests) => {
+      quests.forEach((quest) => {
+        const marker = MarkerHelper.createMarker(
+          quest,
+          map.current!,
+          createMarkerOptions
+        )
+        quest.marker = marker
+        markers.push(marker)
+        setIsLoading(false)
+      })
     })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
