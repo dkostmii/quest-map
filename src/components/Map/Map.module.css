@@ -1,5 +1,6 @@
 .container {
   height: 400px;
+  position: relative;
 }
 
 .map {
@@ -14,5 +15,17 @@
   margin: 12px;
   border-radius: 4px;
   position: absolute;
+  z-index: 2;
+}
+
+.overlay {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
   z-index: 1;
+  background-color: rgba(127 127 127 / 66%);
+  height: inherit;
+  width: 100%;
+  font-size: 1.5rem;
 }

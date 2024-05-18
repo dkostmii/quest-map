@@ -21,6 +21,7 @@ function Map() {
   const [lng, setLng] = useState(-70.9)
   const [lat, setLat] = useState(42.35)
   const [zoom, setZoom] = useState(9)
+  const [isLoading, setIsLoading] = useState(true)
   const zoomBelowThreshold = zoom < zoomThreshold
   const [clusterMarkers] = useState<Marker[]>([])
   const [markers] = useState<Marker[]>([])
@@ -56,6 +57,7 @@ function Map() {
         clusterMarkers.forEach((marker) => marker.remove())
         markers.splice(0)
 
+        setIsLoading(true)
         questService.getAll().then((quests) => {
           quests.forEach((quest) => {
             const marker = MarkerHelper.createMarker(
@@ -65,6 +67,7 @@ function Map() {
             )
             quest.marker = marker
             markers.push(marker)
+            setIsLoading(false)
           })
         })
       }
@@ -101,7 +104,9 @@ function Map() {
         return
       }
 
+      setIsLoading(true)
       const quest = await questService.add(e.lngLat)
+      setIsLoading(false)
       quest.marker = MarkerHelper.createMarker(
         quest,
         map.current!,
@@ -117,9 +122,17 @@ function Map() {
       const quest = questService.findByMarker(activeMarker)
 
       if (quest) {
+        setIsLoading(true)
         await questService.remove(quest)
+        setIsLoading(false)
       }
     }
+  }
+
+  const removeAllHandler = async () => {
+    setIsLoading(true)
+    await questService.removeAll()
+    setIsLoading(false)
   }
 
   return (
@@ -128,7 +141,7 @@ function Map() {
       <button type="button" onClick={removeActiveQuestHandler}>
         Remove active quest
       </button>
-      <button type="button" onClick={questService.removeAll.bind(questService)}>
+      <button type="button" onClick={removeAllHandler}>
         Remove all quests
       </button>
       <p>Zoom out below {zoomThreshold} to see the clusters</p>
@@ -141,6 +154,7 @@ function Map() {
           Longitude: {lng.toFixed(4)} | Latitude: {lat.toFixed(4)} | Zoom:{' '}
           {zoom.toFixed(2)}
         </div>
+        {isLoading && <div className={style.overlay}>Loading...</div>}
         <div ref={mapContainer} className={style.map} />
       </div>
     </div>
